@@ -22,6 +22,22 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
+          light: "hsl(var(--primary-light))",
+          lighter: "hsl(var(--primary-lighter))",
+        },
+        // Admin Sidebar Colors
+        "sidebar-dark": "hsl(var(--sidebar-dark))",
+        "sidebar-darker": "hsl(var(--sidebar-darker))",
+        "sidebar-text": "hsl(var(--sidebar-text))",
+        "sidebar-text-muted": "hsl(var(--sidebar-text-muted))",
+        // Status Colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
