@@ -1,18 +1,27 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { FileUpload } from "./FileUpload";
 import { toast } from "sonner";
 import { indianStates } from "@/lib/constants";
+import { Eye, EyeOff, ChevronDown } from "lucide-react";
 
 const brandOwnerSchema = z.object({
   brandName: z.string().min(1, "Brand name is required").max(100),
   brandLogo: z.array(z.instanceof(File)).optional(),
+  email: z.string().email("Invalid email format").min(1, "Email is required"),
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid phone number. Must be 10 digits starting with 6-9"),
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
   businessAddress: z.string().min(1, "Business address is required"),
   panNumber: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"),
   panDocument: z.array(z.instanceof(File)).optional(),
@@ -30,11 +39,17 @@ interface BrandOwnerFormProps {
 }
 
 export function BrandOwnerForm({ onSuccess }: BrandOwnerFormProps) {
+  const [showPassword, setShowPassword] = useState(false);
+  const [isAccountDetailsOpen, setIsAccountDetailsOpen] = useState(true);
+  
   const form = useForm<BrandOwnerFormValues>({
     resolver: zodResolver(brandOwnerSchema),
     defaultValues: {
       brandName: "",
       brandLogo: [],
+      email: "",
+      phone: "",
+      password: "",
       businessAddress: "",
       panNumber: "",
       panDocument: [],
@@ -90,6 +105,77 @@ export function BrandOwnerForm({ onSuccess }: BrandOwnerFormProps) {
             )}
           />
         </div>
+
+        <Collapsible open={isAccountDetailsOpen} onOpenChange={setIsAccountDetailsOpen}>
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 font-semibold text-[#5C2C8F]">
+            Account Details
+            <ChevronDown className={`h-4 w-4 transition-transform ${isAccountDetailsOpen ? 'rotate-180' : ''}`} />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input type="email" placeholder="example@domain.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input type="tel" placeholder="Enter 10-digit mobile number" {...field} maxLength={10} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Input 
+                        type={showPassword ? "text" : "password"} 
+                        placeholder="Create Password" 
+                        {...field} 
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                        onClick={() => setShowPassword(!showPassword)}
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </Button>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </CollapsibleContent>
+        </Collapsible>
 
         <FormField
           control={form.control}
