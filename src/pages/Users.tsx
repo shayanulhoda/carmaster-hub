@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { AddUserDialog } from "@/components/users/AddUserDialog";
 import { 
   Search, 
   Filter, 
@@ -41,7 +43,7 @@ const usersData = {
   ],
 };
 
-function UserTable({ users, userType }: { users: any[], userType: string }) {
+function UserTable({ users, userType, onAddNew }: { users: any[], userType: string, onAddNew: () => void }) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Active":
@@ -89,7 +91,7 @@ function UserTable({ users, userType }: { users: any[], userType: string }) {
             <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
-          <Button className="admin-button-primary" size="sm">
+          <Button className="admin-button-primary" size="sm" onClick={onAddNew}>
             Add New
           </Button>
         </div>
@@ -144,6 +146,14 @@ function UserTable({ users, userType }: { users: any[], userType: string }) {
 }
 
 export default function Users() {
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedUserType, setSelectedUserType] = useState<"brandOwners" | "wholesalers" | "retailers" | "customers">("brandOwners");
+
+  const handleAddNew = (userType: "brandOwners" | "wholesalers" | "retailers" | "customers") => {
+    setSelectedUserType(userType);
+    setDialogOpen(true);
+  };
+
   return (
     <DashboardLayout>
       <div className="flex-1 overflow-auto">
@@ -230,25 +240,31 @@ export default function Users() {
                 </TabsList>
 
                 <TabsContent value="brandOwners">
-                  <UserTable users={usersData.brandOwners} userType="brand owners" />
+                  <UserTable users={usersData.brandOwners} userType="brand owners" onAddNew={() => handleAddNew("brandOwners")} />
                 </TabsContent>
 
                 <TabsContent value="wholesalers">
-                  <UserTable users={usersData.wholesalers} userType="wholesalers" />
+                  <UserTable users={usersData.wholesalers} userType="wholesalers" onAddNew={() => handleAddNew("wholesalers")} />
                 </TabsContent>
 
                 <TabsContent value="retailers">
-                  <UserTable users={usersData.retailers} userType="retailers" />
+                  <UserTable users={usersData.retailers} userType="retailers" onAddNew={() => handleAddNew("retailers")} />
                 </TabsContent>
 
                 <TabsContent value="customers">
-                  <UserTable users={usersData.customers} userType="customers" />
+                  <UserTable users={usersData.customers} userType="customers" onAddNew={() => handleAddNew("customers")} />
                 </TabsContent>
               </Tabs>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      <AddUserDialog 
+        open={dialogOpen} 
+        onOpenChange={setDialogOpen} 
+        userType={selectedUserType}
+      />
     </DashboardLayout>
   );
 }
